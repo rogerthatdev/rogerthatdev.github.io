@@ -68,7 +68,7 @@ The id field is the name that will show up in the logs, and the name field is th
 
 You can kick off a Cloud Build job by running `gcloud builds submit .` in your working directory. It will automatically look for a `cloudbuild.yaml` file and create a Cloud Build job that will execute the provided instructions. You can see the progress as output in your terminal or head over the [Cloud Build History page](https://console.cloud.google.com/cloud-build/builds) where you’ll see your job’s status and output:
 
-![screenshot of build details](/static/img/builddetails.png)
+![screenshot of build details](/img/builddetails.png)
 
 And there you have it! Cloud Build executing Terraform! That’s all there is to it!
 
