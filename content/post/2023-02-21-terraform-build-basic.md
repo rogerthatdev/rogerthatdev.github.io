@@ -1,7 +1,7 @@
 ---
 title: "Terraform using Google Cloud Build"
 subtitle: "A very basic example"
-date: 2023-02-21
+date: 2023-04-01
 author: rogerthat terraformer
 tags: ["terraform", "cicd", "cloud build"]
 ---
