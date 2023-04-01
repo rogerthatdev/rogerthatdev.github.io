@@ -4,6 +4,7 @@ subtitle: "A very basic example"
 date: 2023-04-01
 author: rogerthat terraformer
 tags: ["terraform", "cicd", "cloud build"]
+# bigimg: [{src: "/img/buildform.png", desc: "cloud build and terraform"}]
 ---
 
 ![banner](/img/buildform.png)
