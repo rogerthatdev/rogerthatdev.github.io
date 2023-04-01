@@ -6,6 +6,8 @@ author: rogerthat terraformer
 tags: ["terraform", "cicd", "cloud build"]
 ---
 
+![banner](/img/buildform.png)
+
 CI/CD can get pretty complicated. There are a lot of moving pieces and a lot of automation. But as they say, the only way to eat an elephant is one bite at a time. So here’s a first nibble.
 <!--more-->
 
