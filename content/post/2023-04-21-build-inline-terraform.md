@@ -1,7 +1,7 @@
 ---
 title: "Cloud Build Trigger with Inline YAML via Terraform"
 subtitle: "providing ad-hoc cloud build config via terraform"
-date: 2023-04-12
+date: 2023-04-21
 author: rogerthat terraformer
 tags: ["terraform", "cloud build"]
 ---
@@ -12,7 +12,9 @@ When you configure a Cloud Build trigger via the Cloud Console, you have the
 option of specifying the the `cloubuild.yaml` configuration as either a file
 location on the repository or as an inline configuration.  I'm going to show you
 how you can create a Cloud Build trigger with inline configuration using
-Terraform. We're gonna make use of Terraform's [templatefile() function](https://developer.hashicorp.com/terraform/language/functions/templatefile).    
+Terraform. We're gonna make use of Terraform's [templatefile() function](https://developer.hashicorp.com/terraform/language/functions/templatefile).
+
+Follow along with the [code available here](https://github.com/rogerthatdev/cloud-build-terraform/tree/main/inline-yaml).
 <!--more-->
 
 ## Simplest example
