@@ -62,13 +62,25 @@ steps:
 timeout: 600s
 
 ```
-This works great when it's one step, but could be impractical for configs that 
-have multiple steps and updated often.  This is where `tftpl` files come in 
-handy.
+
 
 ## Use a yaml.tftpl file
-By using a Terraform template file that looks like the familiar cloudbuild.yaml 
-file, you can easily configure a trigger with multiple steps, configured inline:
+
+You can acheive the above configuration using a Terraform template file that 
+looks like the familiar cloudbuild.yaml file:
+
+```
+# 02-simple.cloudbuild.yaml.tftpl
+steps:
+  - name: ubuntu
+    args:
+      - echo
+      - hello world hey
+timeout: 600s
+
+```
+
+I can pass along values for the `step` block using a local value:
 
 ```
 locals {
@@ -100,8 +112,39 @@ resource "google_cloudbuild_trigger" "simple_inline_02" {
   }
 }
 ```
+When deployed, the trigger will have the same in-line configuration as the 
+example above:
+```
+steps:
+  - name: ubuntu
+    args:
+      - echo
+      - hello world hey
+timeout: 600s
+
+```
+To pass along values for more than one step, I'll use a dynamic block.
+
 
 ## The dynamic `step` block
+
+Here's a new template file with two steps:
+
+```
+# 03-multi-step-dynamic.cloudbuild.yaml.tftpl
+steps:
+  - name: ubuntu
+    args:
+      - echo
+      - hello world hey
+  - name: ubuntu
+    args:
+      - echo
+      - peace out world
+timeout: 600s
+
+```
+And here's our trigger configuration:
 
 ```
 locals {
@@ -137,20 +180,88 @@ resource "google_cloudbuild_trigger" "simple_inline_03" {
   }
 }
 ```
+I used a `for_each` in a dynamic block to dynamically create a `step` block for 
+each step in the template file. 
 
 ## Values for template variables 
-
+There are a couple of ways to pass along values for variables you might want to 
+use in a Terraform template file. The first one is by passing values through the 
+`templatefile()` function:
 ```
 locals {
   # You can pass values for variables in the yaml config via the second 
   # parameter of the templatefile() function:
   simple_config_04 = yamldecode(templatefile("${path.root}/cloudbuild/04-multi-step-dynamic-with-vars.cloudbuild.yaml", { "variable_here" = "WORLD", "another_variable" = "MARS" }))
 }
+```
 
-resource "google_cloudbuild_trigger" "simple_inline_04" {
+Here's the template file for reference:
+
+```
+# 04-multi-step-dynamic-with-vars.cloudbuild.yaml.tftpl
+steps:
+  - name: ubuntu
+    args:
+      - echo
+      - hello ${variable_here} hey
+  - name: ubuntu
+    args:
+      - echo
+      - peace out ${another_variable}
+timeout: 600s
+
+```
+
+This results in the following Cloud Build config inline:
+
+```
+steps:
+  - name: ubuntu
+    args:
+      - echo
+      - hello WORLD hey
+  - name: ubuntu
+    args:
+      - echo
+      - peace out MARS
+timeout: 600s
+```
+If you want to use a built-in variable in this configuration, like 
+`$PROJECT_ID` or `$SHORT_SHA` you have escape the `$` character by adding an 
+extra `$` (eg: `$$PROJECT_ID` AND `$SHORT_SHA`)
+
+## Using the `substitutions` parameter
+
+A better option for passing values to variables is the substitutions parameter. 
+To do this, I have to escape the `$` character where I want variables:
+
+```
+# 05-multi-step-dynamic-with-subs.cloudbuild.yaml.tftpl
+steps:
+  - name: ubuntu
+    args:
+      - echo
+      - hello $${variable_here} hey
+  - name: ubuntu
+    args:
+      - echo
+      - peace out $${another_variable}
+timeout: 600s
+```
+Now when I bring in the template I don't need to supply any values via the 
+`templatefile()` function:
+```
+locals {
+  # Pass no values to the templatefile() function:
+  simple_config_05 = yamldecode(templatefile("${path.root}/cloudbuild/05-multi-step-dynamic-with-subs.cloudbuild.yaml.tftpl", {}))
+}
+```
+I instead add values in the substitutions parameter:
+```
+resource "google_cloudbuild_trigger" "simple_inline_05" {
   project     = var.project_id
   location    = var.region
-  name        = "04-simple-inline-config-example-with-vars"
+  name        = "05-multi-step-dynamic-with-subs"
   description = "This trigger is deployed by terraform, with an in-line build config."
   trigger_template {
     branch_name  = "^main$"
@@ -160,11 +271,15 @@ resource "google_cloudbuild_trigger" "simple_inline_04" {
   }
   build {
     images        = []
-    substitutions = {}
+    # This is where you'll supply the values for your variables
+    substitutions = {
+      variable_here = "WORLD"
+      another_variable = "MARS"
+    }
     tags          = []
-    # This is the same dynamic block used in trigger 03 above
+    # This is the same dynamic block used in trigger 03 and 04 above
     dynamic "step" {
-      for_each = local.simple_config_04.steps
+      for_each = local.simple_config_05.steps
       content {
         args = step.value.args
         name = step.value.name
@@ -173,3 +288,22 @@ resource "google_cloudbuild_trigger" "simple_inline_04" {
   }
 }
 ```
+And with that, a trigger will be configured with the following in-line 
+configuration:
+
+```
+steps:
+  - name: ubuntu
+    args:
+      - echo
+      - 'hello ${variable_here} hey'
+  - name: ubuntu
+    args:
+      - echo
+      - 'peace out ${another_variable}'
+timeout: 600s
+substitutions:
+  another_variable: MARS
+  variable_here: WORLD
+```
+
