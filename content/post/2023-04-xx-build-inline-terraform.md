@@ -8,7 +8,11 @@ tags: ["terraform", "cloud build"]
 
 ![banner](/img/inline-config.png)
 
-When creating a Cloud Build trigger in the Cloud Console, you can specify an "in-line" location for your build configuration, essentially bundling the trigger with the config.  If you do this with Terraform, you'll be able to bundle the build config with the Terraform resource. Here's how.  
+When you configure a Cloud Build trigger via the Cloud Console, you have the
+option of specifying the the `cloubuild.yaml` configuration as either a file
+location on the repository or as an inline configuration.  I'm going to show you
+how you can create a Cloud Build trigger with inline configuration using
+Terraform. We're gonna make use of Terraform's [templatefile() function](https://developer.hashicorp.com/terraform/language/functions/templatefile).    
 <!--more-->
 
 ## Simplest example
