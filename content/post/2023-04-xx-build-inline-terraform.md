@@ -16,6 +16,8 @@ Terraform. We're gonna make use of Terraform's [templatefile() function](https:/
 <!--more-->
 
 ## Simplest example
+Here's a basic Cloud Build Trigger configured with a Cloud Source Repo I made 
+somewhere else in this `.tf` file:
 
 ```
 resource "google_cloudbuild_trigger" "simplest_inline" {
@@ -27,6 +29,8 @@ resource "google_cloudbuild_trigger" "simplest_inline" {
     branch_name  = "^main$"
     invert_regex = false
     project_id   = var.project_id
+    # I can't create a trigger without connecting a repo to the project, so I 
+    # made a Cloud Source Repo and passed it along here
     repo_name    = google_sourcerepo_repository.placeholder.name
   }
   build {
@@ -46,7 +50,25 @@ resource "google_cloudbuild_trigger" "simplest_inline" {
 }
 ```
 
-## Use a yaml file
+It's a single step, passed along to the `build` block. This trigger will have the following Cloud Build config 
+configured inline:
+
+```yaml
+steps:
+  - name: ubuntu
+    args:
+      - echo
+      - hello world hey
+timeout: 600s
+
+```
+This works great when it's one step, but could be impractical for configs that 
+have multiple steps and updated often.  This is where `tftpl` files come in 
+handy.
+
+## Use a yaml.tftpl file
+By using a Terraform template file that looks like the familiar cloudbuild.yaml 
+file, you can easily configure a trigger with multiple steps, configured inline:
 
 ```
 locals {
