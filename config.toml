@@ -1,4 +1,4 @@
-baseurl = "https://rogerthatdev.github.io"
+baseurl = "rogerthis.net"
 DefaultContentLanguage = "en"
 title = "rogerthatdev"
 theme = "beautifulhugo"
@@ -45,7 +45,7 @@ pygmentsCodefencesGuessSyntax = true
 [Author]
   # Set only your "username" for default hosts and full URLs otherwise (e.g., "https://MyGitLab.org/username")
   name = "Roger Martinez"
-  website = "rogerthat.dev"
+  website = "rogerthis.net"
   email = "rogerthatdev@gmail.com"
   github = "rogerthatdev"
   # reddit = "username"
